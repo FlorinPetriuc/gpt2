@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import block
+import contextlib
 import logging
 import math
 import matplotlib
@@ -21,7 +22,7 @@ class GPT2(nn.Module):
         "small":  { "n_layer": 12, "n_head": 12, "n_embd":  768 },
         "medium": { "n_layer": 24, "n_head": 16, "n_embd": 1024 },
         "large":  { "n_layer": 36, "n_head": 20, "n_embd": 1280 },
-        "xl":     { "n_layer": 48, "n_head": 25, "n_enbd": 1600 },
+        "xl":     { "n_layer": 48, "n_head": 25, "n_embd": 1600 },
     }
 
     def __init__(self, size):
