@@ -39,7 +39,7 @@ def main():
     logging.info(f"Using size {args.size}")
     model = gpt2.GPT2(args.size).to(device)
     n_params = sum(p.numel() for p in model.parameters())
-    logging.info("GTP-2 %s: %sM parameters on %s", args.size, n_params / 1e6, device)
+    logging.info("GPT-2 %s: %sM parameters on %s", args.size, n_params / 1e6, device)
     if args.train_data:
         train(model, args.train_data)
     elif args.generate:
