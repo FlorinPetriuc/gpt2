@@ -31,6 +31,8 @@ class GPT2(nn.Module):
         self.wte = nn.Embedding(self.VOCAB_SIZE, self._size["n_embd"])
         self.wpe = nn.Embedding(self.BLOCK_SIZE, self._size["n_embd"])
         self.drop = nn.Dropout(self.DROPOUT)
+        self._activations = []
+        self._handles = []
         self.h = nn.ModuleList(
             block.Block(
                 self._size["n_embd"],
@@ -56,6 +58,22 @@ class GPT2(nn.Module):
                 nn.init.zeros_(m.bias)
         elif isinstance(m, nn.Embedding):
             nn.init.normal_(m.weight, mean=0.0, std=0.02)
+
+    def reset_activations(self):
+        self._activations = []
+
+    def pre_hook(self, module, inputs):
+        self._activations.append(inputs[0].detach().float().cpu()[0])
+
+    def activate_prehooks(self):
+        self._handles = [blk.mlp.c_proj.register_forward_pre_hook(self.pre_hook) for blk in self.h]
+
+    def get_activations(self):
+        return torch.stack(self._activations)
+
+    def remove_prehooks(self):
+        for h in self._handles:
+            h.remove()
 
     def forward(self, idx, targets=None):
         B, T = idx.shape
